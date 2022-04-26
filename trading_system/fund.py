@@ -29,9 +29,8 @@ class Fund:
         base_price_el = self.driver.find_element_by_class_name("value-01")
         self.base_price = int(base_price_el.text.replace(",", ""))
 
-        # rate_for_yesterday_el = self.driver.find_element_by_class_name("ratio-01 up-01")
         rate_for_yesterday_el = self.driver.find_elements(by=By.CLASS_NAME, value="ratio-01")
-        print(rate_for_yesterday_el[1].text)
+
         if rate_for_yesterday_el[1].text[0] == "-":
             self.is_down = True
         elif rate_for_yesterday_el[1].text[0] == "+":
