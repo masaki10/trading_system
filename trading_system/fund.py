@@ -12,11 +12,22 @@ import config as cf
 from utils import send_message
 
 class Fund:
-    def __init__(self, fund_url, rate, price):
+    def __init__(self, fund_url, rate=None, price=None, price_dic=None, is_rate_for_yesterday=False, is_base_price=False):
+        if is_base_price == is_rate_for_yesterday:
+            raise
+        if is_rate_for_yesterday and (rate is None or price is None):
+            raise
+        if is_base_price and price_dic is None:
+            raise
         self.fund_url = fund_url
         # self.symbol = symbol
-        self.rate = rate
-        self.price = price
+        if is_rate_for_yesterday:
+            self.rate = rate
+            self.price = price
+        if is_base_price:
+            self.price_dic = sorted(price_dic.items())
+        self.is_rate_for_yesterday = is_rate_for_yesterday
+        self.is_base_price = is_base_price
         self.driver = webdriver.Chrome()
 
     def get_basic_price(self):
@@ -42,22 +53,28 @@ class Fund:
 
         message = f"ファンド名 : {self.fund_name}\n基準価格 : {self.base_price}\n"
         if self.is_down:
-            message += f"-{self.rate_for_yesterday}"
+            message += f"前日比 : -{self.rate_for_yesterday}"
         else:
-            message += f"+{self.rate_for_yesterday}"
+            message += f"前日比 : +{self.rate_for_yesterday}"
 
         send_message(message)
 
     def is_trading(self):
-        if not self.is_down:
+        if self.is_rate_for_yesterday:
+            if not self.is_down:
+                return False
+            
+            if self.rate_for_yesterday > self.rate:
+                return True
+            
             return False
-        
-        if self.rate_for_yesterday > self.rate:
-            return True
-        
-        return False
+        elif self.is_base_price:
+            for key, value in self.price_dic:
+                if self.base_price < key:
+                    return True
+            return False
 
-    def buy(self):
+    def _buy(self, price):
         self.driver.get(self.fund_url)
         time.sleep(1)
 
@@ -84,7 +101,7 @@ class Fund:
         time.sleep(1)
 
         price_el = self.driver.find_element(by=By.NAME, value="orderPriceUnit")
-        price_el.send_keys(self.price)
+        price_el.send_keys(price)
 
         prospectus_el = self.driver.find_element(
             by=By.NAME, value="prospectusAgreementCheck")
@@ -102,5 +119,14 @@ class Fund:
         order_btn_el.click()
         time.sleep(1)
 
-        message = f"ファンド名 : {self.fund_name}\n買い付け価格 : {self.price}\n"
+        message = f"ファンド名 : {self.fund_name}\n買い付け価格 : {price}"
         send_message(message)
+
+    def buy(self):
+        if self.is_rate_for_yesterday:
+            self._buy(self.price)
+        elif self.is_base_price:
+            for key, value in self.price_dic:
+                if self.base_price < key:
+                    self._buy(value)
+                    break

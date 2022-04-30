@@ -5,7 +5,7 @@ import config as cf
 from fund import Fund
 
 if __name__ == "__main__":
-    leve_nas = Fund(cf.FUND_URL, cf.RATE, cf.PRICE)
+    leve_nas = Fund(cf.FUND_URL, cf.RATE, cf.PRICE, cf.PRICE_DIC, cf.IS_RATE_FOR_YESTERDAY, cf.IS_BASE_PRICE)
     leve_nas.get_basic_price()
     if leve_nas.is_trading():
         leve_nas.buy()
