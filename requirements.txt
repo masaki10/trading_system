@@ -2,3 +2,5 @@ flask
 line-bot-sdk
 selenium
 chromedriver_binary==100.0.4896.60
+pycryptodome
+pyinstaller

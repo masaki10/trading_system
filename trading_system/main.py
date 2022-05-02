@@ -4,9 +4,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import config as cf
 from fund import Fund
 
-if __name__ == "__main__":
+def run_trading():
     leve_nas = Fund(cf.FUND_URL, cf.RATE, cf.PRICE, cf.PRICE_DIC, cf.IS_RATE_FOR_YESTERDAY, cf.IS_BASE_PRICE)
     leve_nas.get_basic_price()
     if leve_nas.is_trading():
         leve_nas.buy()
-        # print(leve_nas.is_trading())
+
+if __name__ == "__main__":
+    run_trading()

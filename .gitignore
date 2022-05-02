@@ -3,3 +3,8 @@ line
 __pycache__
 trading_system/__pycache__
 logs/*
+pwd_key.bin
+order_num_key.bin
+trading_system/main.spec
+trading_system/build
+trading_system/dist

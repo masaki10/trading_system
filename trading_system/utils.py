@@ -10,6 +10,7 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
+from Crypto.Cipher import AES
 
 import os
 import sys
@@ -22,19 +23,16 @@ handler = WebhookHandler(cf.CHANNEL_SECRET)
 def send_message(message):
     line_bot_api.push_message(cf.USER_ID, TextSendMessage(text=message))
 
-# def login_to_rakuten():
-#     driver = webdriver.Chrome()
-#     driver.get(cf.RAKUTEN_URL)
-#     time.sleep(1)
-        
-#     id_el = driver.find_element_by_name("loginid")
-#     id_el.send_keys(cf.RAKUTEN_ID)
+def decrypt_data(ciphertext, tag, filename):
+    with open(filename, "rb") as f:
+        key = f.read(16)
+        nonce = f.read(16)
+    cipher_dec = AES.new(key, AES.MODE_EAX, nonce)
+    data = cipher_dec.decrypt_and_verify(ciphertext, tag)
+    return data
 
-#     passwd_el = driver.find_element_by_name("passwd")
-#     passwd_el.send_keys(cf.RAKUTEN_PASSWORD)
+def get_pwd():
+    pass
 
-#     try:
-#         passwd_el.submit()
-#         return "ok"
-#     except:
-#         return None
+def get_order_num():
+    pass
